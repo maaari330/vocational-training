@@ -5,7 +5,16 @@ import pickle as pk
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
-from sklearn.metrics import classification_report
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    recall_score,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -181,3 +190,26 @@ pred = DecitreeModel.predict(x_new)
 scores = classification_report(t, pred, output_dict=True)
 scores_df = pd.DataFrame(scores)
 print(scores_df)
+
+Labels = [0, 1]
+PosLabel = 0
+
+print("Accuracy:\n", accuracy_score(t, pred))
+print("Confusion matrix:\n", confusion_matrix(t, pred, labels=Labels))
+print("Precision:\n", precision_score(t, pred, pos_label=PosLabel))
+print("Recall:\n", recall_score(t, pred, pos_label=PosLabel))
+print("F-measure:\n", f1_score(t, pred, pos_label=PosLabel))
+
+# マクロ平均
+precision_0 = scores_df.loc["precision", "0"]
+precision_1 = scores_df.loc["precision", "1"]
+support_0 = scores_df.loc["support", "0"]  # 重み
+support_1 = scores_df.loc["support", "1"]
+
+# 加重平均
+macro_avg = (precision_0 + precision_1) / 2
+weighted_avg = (precision_0 * support_0 + precision_1 * support_1) / (
+    support_0 + support_1
+)
+
+print(round(macro_avg, 6), round(weighted_avg, 6))
